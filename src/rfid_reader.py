@@ -4,6 +4,7 @@ from typing import Tuple
 
 import serial
 
+from .constants import CMD_GET_MODULE_INFO
 from .constants import CMD_MULTIPLE_POLL_INSTRUCTION
 from .utils import R200Interface
 from .utils import R200PoolResponse
@@ -95,3 +96,16 @@ class R200(R200Interface):
         responses = self.receive()
 
         return self._read_tags(responses)
+
+    def hw_info(self) -> List[R200PoolResponse]:
+        self.send_command(
+            CMD_GET_MODULE_INFO,
+            [
+                0x00,
+            ],
+        )
+        responses = self.receive()
+        for resp in responses:
+            if resp.command == CMD_GET_MODULE_INFO:
+                return "".join(map(chr, resp.params[1:]))
+        return Exception("Error reading RFID")

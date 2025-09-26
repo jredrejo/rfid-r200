@@ -5,6 +5,7 @@ from typing import List
 
 import serial_asyncio
 
+from .constants import CMD_GET_MODULE_INFO
 from .constants import CMD_MULTIPLE_POLL_INSTRUCTION
 from .utils import R200AsyncInterface
 from .utils import R200PoolResponse
@@ -85,3 +86,16 @@ class R200Async(R200AsyncInterface):
         responses = await self.receive()
 
         return self._read_tags(responses)
+
+    async def hw_info(self) -> List[R200PoolResponse]:
+        await self.send_command(
+            CMD_GET_MODULE_INFO,
+            [
+                0x00,
+            ],
+        )
+        responses = await self.receive()
+        for resp in responses:
+            if resp.command == CMD_GET_MODULE_INFO:
+                return "".join(map(chr, resp.params[1:]))
+        return Exception("Error reading RFID")

@@ -234,6 +234,10 @@ class R200AsyncInterface(ABC, CommonR200Interface):
     def _read_all_available(self) -> bytes:
         pass
 
+    @abstractmethod
+    async def hw_info(self) -> List[R200PoolResponse]:
+        pass
+
 
 class R200Interface(ABC, CommonR200Interface):
     @abstractmethod
@@ -254,4 +258,8 @@ class R200Interface(ABC, CommonR200Interface):
 
     @abstractmethod
     def _read_all_available(self) -> bytes:
+        pass
+
+    @abstractmethod
+    def hw_info(self) -> List[R200PoolResponse]:
         pass
