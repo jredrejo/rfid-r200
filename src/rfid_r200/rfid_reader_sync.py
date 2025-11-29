@@ -30,6 +30,9 @@ class R200(R200Interface):
             debug: Enable debug output (default: False)
         """
         self.debug = debug
+        self.port_name = port
+        self.speed = speed
+        self.timeout = timeout
         self.port = None
 
         try:
@@ -42,8 +45,10 @@ class R200(R200Interface):
                 timeout=timeout,
                 write_timeout=timeout,
             )
+        except OSError as e:
+            raise OSError(f"Failed to open serial port: {e}") from e
         except Exception as e:
-            raise RuntimeError(f"Failed to open serial port: {e}")
+            raise RuntimeError(f"Failed to open serial port: {e}") from e
 
     def close(self) -> None:
         """Close the serial port connection"""
@@ -51,6 +56,15 @@ class R200(R200Interface):
             self.port.close()
         else:
             raise RuntimeError("Serial port not opened")
+
+    def __enter__(self):
+        """Context manager entry."""
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit."""
+        self.close()
+        return False
 
     def send_command(self, command: int, parameters: List[int] = None) -> None:
         """
@@ -67,10 +81,10 @@ class R200(R200Interface):
     def _read_all_available(self) -> bytes:
         """Read until no more bytes arrive within the configured timeout."""
         buf = bytearray()
-        chunk = self.port.read(512)
-        buf.extend(chunk)
-        while chunk:
+        while True:
             chunk = self.port.read(512)
+            if not chunk:
+                break
             buf.extend(chunk)
         return bytes(buf)
 

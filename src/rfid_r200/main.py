@@ -1,7 +1,7 @@
 import binascii
 import time
 
-from .rfid_reader import R200
+from rfid_r200 import R200
 
 
 def example_usage():
@@ -11,7 +11,11 @@ def example_usage():
 
     info = rfid.hw_info()
     print(info)
-
+    power = rfid.get_power()
+    print(f"Current acquire transmit power: {power} dBm")
+    # await rfid.set_demodulator_params(mixer_g=2, if_g=7, thrd=100)
+    demod_params = rfid.get_demodulator_params()
+    print(f"Demodulator parameters: {demod_params}")
     print("Press Ctrl+C to end")
     while True:
         try:
@@ -21,7 +25,7 @@ def example_usage():
                 print(f"Found {len(tags)} tags:")
                 for i, tag in enumerate(tags):
                     epc_hex = binascii.hexlify(bytes(tag.epc)).decode()
-                    print(f"Tag {i+1}:")
+                    print(f"Tag {i + 1}:")
                     print(f"  EPC: {epc_hex}")
                     print(f"  RSSI: {tag.rssi}")
                     print(f"  PC: 0x{tag.pc:04x}")

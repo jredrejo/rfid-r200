@@ -1,16 +1,72 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "rfid-r200"
-version = "0.1.0"
-description = "Pure python library to work with RFID devices R200"
+version = "0.1.1"
+description = "Pure Python library to work with RFID R200 devices via serial communication"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "pyserial-asyncio>=0.6",
 ]
+license = "GPL-3.0-or-later"
+authors = [
+    {name = "José L. Redrejo Rodríguez", email = "jredrejo@debian.org"}
+]
+maintainers = [
+    {name = "José L. Redrejo Rodríguez", email = "jredrejo@debian.org"}
+]
+keywords = ["rfid", "r200", "serial", "hardware", "reader", "uhf"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Hardware :: Hardware Drivers",
+    "Topic :: Communications",
+    "Topic :: Software Development :: Embedded Systems",
+]
+
+
+[project.urls]
+Homepage = "https://github.com/jredrejo/rfid-r200"
+Documentation = "https://github.com/jredrejo/rfid-r200/blob/main/README.md"
+Repository = "https://github.com/jredrejo/rfid-r200.git"
+"Bug Tracker" = "https://github.com/jredrejo/rfid-r200/issues"
+Changelog = "https://github.com/jredrejo/rfid-r200/blob/main/CHANGELOG.md"
 
 [dependency-groups]
 dev = [
     "black>=25.9.0",
+    "build>=1.3.0",
     "mypy>=1.18.2",
     "pytest>=8.4.2",
+    "pytest-asyncio>=0.24.0",
+    "pytest-cov>=6.0.0",
+    "flake8>=7.1.1",
+    "pre-commit>=4.0.1",
+    "twine>=6.2.0",
 ]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/tests",
+    "/README.md",
+    "/LICENSE",
+    "/CHANGELOG.md",
+    "/CONTRIBUTING.md",
+    "/MANIFEST.in",
+    "/pyproject.toml",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]

@@ -4,7 +4,7 @@ A Python library for interfacing with R200 RFID modules via serial communication
 
 ## Features
 
-- **Complete R200 Protocol Support**: Implements the full R200 RFID module communication protocol
+- **Partial R200 Protocol Support**: Implements the parts of the R200 RFID module communication protocol
 - **Object-Oriented Design**: Clean, maintainable code with abstract interfaces
 - **Type Safety**: Full type hints for better IDE support and code reliability
 - **Error Handling**: Comprehensive error handling with descriptive messages
@@ -14,28 +14,37 @@ A Python library for interfacing with R200 RFID modules via serial communication
 
 ## Installation
 
-### Prerequisites
+### Install from PyPI
 
 ```bash
-uv run
+pip install rfid-r200
 ```
 
-### Initial run
+### Development Installation
 
 ```bash
-python -m src.main
+git clone https://github.com/jredrejo/rfid-r200.git
+cd rfid-r200
+uv pip install -e .[dev,test]
+uv sync --group dev
 ```
 
-or if you prefer to test the async version
+### Quick Start Examples
 
 ```bash
-uv -m src.main_async
+# Run synchronous example
+uv run src/main.py
+
+# Run asynchronous example
+uv run src/main_async.py
 ```
 
 ## Quick Start
 
+### Synchronous Example
+
 ```python
-from r200 import R200
+from rfid_r200 import R200
 import binascii
 
 # Initialize the RFID module
@@ -44,7 +53,7 @@ rfid = R200("/dev/ttyUSB0", 115200, debug=True)  # Linux
 
 try:
     # Read RFID tags
-    tags = rfid.read_tags()
+    tags, errors = rfid.read_tags()
 
     print(f"Found {len(tags)} tags:")
     for i, tag in enumerate(tags):
@@ -55,19 +64,67 @@ finally:
     rfid.close()
 ```
 
-## API Reference (for the sync version, async version is mostly the same)
-
-### R200 Class
-
-#### Constructor
+### Asynchronous Example
 
 ```python
-R200(port: str, speed: int = 115200, debug: bool = False)
+from rfid_r200 import AsyncR200
+import binascii
+import asyncio
+
+async def main():
+    # Initialize the RFID module
+    rfid = AsyncR200("/dev/ttyUSB0", 115200, debug=True)
+
+    try:
+        # Read RFID tags
+        tags, errors = await rfid.read_tags()
+
+        print(f"Found {len(tags)} tags:")
+        for i, tag in enumerate(tags):
+            epc_hex = binascii.hexlify(bytes(tag.epc)).decode()
+            print(f"Tag {i+1}: EPC={epc_hex}, RSSI={tag.rssi}")
+    finally:
+        await rfid.close()
+
+asyncio.run(main())
+```
+
+### Using as Context Manager
+
+```python
+from rfid_r200 import R200
+
+# Automatically closes the port when exiting the block
+with R200("/dev/ttyUSB0") as rfid:
+    tags, errors = rfid.read_tags()
+    for tag in tags:
+        print(f"Found tag: {tag.epc}")
+```
+
+## API Reference
+
+### Synchronous Interface (R200)
+
+```python
+from rfid_r200 import R200
+```
+
+### Asynchronous Interface (AsyncR200)
+
+```python
+from rfid_r200 import AsyncR200
+```
+
+### R200 / AsyncR200 Constructor
+
+```python
+R200(port: str, speed: int = 115200, debug: bool = False, timeout: float = 1.0)
 ```
 
 - `port`: Serial port name (e.g., "/dev/ttyUSB0", "COM3")
 - `speed`: Baud rate (default: 115200)
 - `debug`: Enable debug output (default: False)
+- `timeout`: Serial port timeout in seconds (default: 1.0)
 
 #### Methods
 
@@ -233,20 +290,44 @@ Buffer: aa01220011001e9f12041e008bb2d1234567890123dd
 
 ## Development
 
-This repository uses pre-commit, uv and black.
-After running `uv run`, you have to run
+### Setup Development Environment
 
 ```bash
+# Install dependencies with uv
+uv pip install -e .[dev,test]
+uv sync --group dev
+
+# Install pre-commit hooks
 uv tool install pre-commit --with pre-commit-uv
-```
-
-then run
-
-```bash
 pre-commit install
 ```
 
-to install the hooks.
+### Development Commands
+
+```bash
+# Run tests
+make test
+
+# Type checking
+make type-check
+
+# Code formatting
+make format
+
+# Linting
+make lint
+
+# All quality checks
+make check
+
+# Build package
+make build
+
+# Full development cycle
+make dev
+```
+
+See `Makefile` for all available commands.
 
 ## License
 

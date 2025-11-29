@@ -1,0 +1,20 @@
+include README.md
+include LICENSE
+include CHANGELOG.md
+include CONTRIBUTING.md
+include MANIFEST.in
+include pyproject.toml
+include mypy.ini
+
+recursive-include src *.py
+recursive-include tests *.py
+recursive-include docs *
+
+global-exclude *.pyc
+global-exclude __pycache__
+global-exclude .git*
+global-exclude .vscode*
+global-exclude *.so
+global-exclude *.egg-info
+global-exclude build
+global-exclude dist
